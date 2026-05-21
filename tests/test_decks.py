@@ -72,3 +72,45 @@ def test_removedDeckConfigId_fails_with_invalid_id(session_with_profile_loaded):
 def test_getDeckStats(session_with_profile_loaded):
     result = ac.getDeckStats(decks=["Default"])
     assert list(result.values())[0]["name"] == "Default"
+
+
+def test_getDeckDescription_default_is_empty(session_with_profile_loaded):
+    result = ac.getDeckDescription(deck="Default")
+    assert result == ""
+
+
+def test_setDeckDescription_then_getDeckDescription(session_with_profile_loaded):
+    ac.createDeck("desc_target")
+    assert ac.setDeckDescription(deck="desc_target",
+                                 description="hello world") is True
+    assert ac.getDeckDescription(deck="desc_target") == "hello world"
+
+
+def test_setDeckDescription_overwrites_existing_value(session_with_profile_loaded):
+    ac.createDeck("desc_target")
+    ac.setDeckDescription(deck="desc_target", description="first")
+    ac.setDeckDescription(deck="desc_target", description="second")
+    assert ac.getDeckDescription(deck="desc_target") == "second"
+
+
+def test_setDeckDescription_accepts_empty_string(session_with_profile_loaded):
+    ac.createDeck("desc_target")
+    ac.setDeckDescription(deck="desc_target", description="something")
+    assert ac.setDeckDescription(deck="desc_target", description="") is True
+    assert ac.getDeckDescription(deck="desc_target") == ""
+
+
+def test_getDeckDescription_raises_for_missing_deck(session_with_profile_loaded):
+    with pytest.raises(Exception):
+        ac.getDeckDescription(deck="no_such_deck")
+
+
+def test_setDeckDescription_raises_for_missing_deck(session_with_profile_loaded):
+    with pytest.raises(Exception):
+        ac.setDeckDescription(deck="no_such_deck", description="x")
+
+
+def test_setDeckDescription_raises_for_non_string_description(session_with_profile_loaded):
+    ac.createDeck("desc_target")
+    with pytest.raises(Exception):
+        ac.setDeckDescription(deck="desc_target", description=123)
