@@ -662,6 +662,57 @@ class AnkiConnect:
         return True
 
     @util.api()
+    def getDeckDescription(self, deck):
+        """
+        Return the description (``desc`` field) of the given deck.
+
+        :param deck: name of the deck whose description should be returned.
+        :return: the deck's description as a string (may be empty).
+        :raises Exception: if a deck with the given name does not exist.
+        """
+        if deck not in self.deckNames():
+            raise Exception('Deck not found: {}'.format(deck))
+
+        collection = self.collection()
+        did = collection.decks.id(deck)
+        deck_dict = collection.decks.get(did)
+        return deck_dict.get('desc', '')
+
+
+    @util.api()
+    def setDeckDescription(self, deck, description):
+        """
+        Overwrite the description (``desc`` field) of the given deck.
+
+        :param deck: name of the deck whose description should be updated.
+        :param description: new description string (may be empty).
+        :return: ``True`` once the description has been persisted.
+        :raises Exception: if a deck with the given name does not exist,
+            or if ``description`` is not a string.
+        """
+        if deck not in self.deckNames():
+            raise Exception('Deck not found: {}'.format(deck))
+        if not isinstance(description, str):
+            raise Exception('description must be a string')
+
+        collection = self.collection()
+        did = collection.decks.id(deck)
+        deck_dict = collection.decks.get(did)
+        deck_dict['desc'] = description
+
+        try:
+            self.startEditing()
+            # ``save`` is the long-standing API used elsewhere in this file
+            # (see e.g. ``setDeckConfigId``) and remains supported on modern
+            # Anki versions as a thin wrapper around ``update_dict``.
+            collection.decks.save(deck_dict)
+        finally:
+            self.stopEditing()
+
+        return True
+
+
+    @util.api()
     def getDeckStats(self, decks):
         collection = self.collection()
         scheduler = self.scheduler()
