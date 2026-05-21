@@ -1,5 +1,22 @@
 *.pyc
+*.pyo
+__pycache__/
 AnkiConnect.zip
 meta.json
 .idea/
+.vscode/
 .tox/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+# Local environment / credentials
+.env
+.env.*
+*.local
+credentials.json
+*.secret
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
